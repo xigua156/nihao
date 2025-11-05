@@ -5,29 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>系统安全提示</title>
     <style>
+        :root {
+            --primary-color: #FFBD00;
+            --primary-dark: #E6A500;
+            --text-dark: #333;
+            --text-gray: #666;
+            --shadow: 0 0 20px rgba(0,0,0,0.2);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Microsoft YaHei', sans-serif;
             text-align: center;
-            padding-top: 50px;
-            background-color: #FFBD00;
-            transition: all 0.5s;
-            margin: 0;
+            background-color: var(--primary-color);
+            transition: var(--transition);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            padding: 20px;
         }
+
         .container {
             background-color: white;
             padding: 30px;
             border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            box-shadow: var(--shadow);
             max-width: 500px;
-            margin: 20px;
+            width: 100%;
+            transition: var(--transition);
         }
-        button {
-            background-color: #FFBD00;
+
+        .btn {
+            background-color: var(--primary-color);
             color: white;
             border: none;
             padding: 12px 24px;
@@ -36,93 +53,191 @@
             cursor: pointer;
             margin: 10px;
             font-weight: bold;
+            transition: var(--transition);
         }
-        button:hover {
-            background-color: #E6A500;
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
         .meituan-logo {
             font-size: 24px;
             font-weight: bold;
-            color: #FFBD00;
+            color: var(--primary-color);
             margin-bottom: 20px;
+        }
+
+        h2 {
+            color: var(--text-dark);
+            margin: 15px 0;
+        }
+
+        p {
+            color: var(--text-gray);
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        /* 抖动动画 */
+        @keyframes shake {
+            0%, 100% { transform: translate(0, 0); }
+            10% { transform: translate(-5px, -5px); }
+            20% { transform: translate(5px, 5px); }
+            30% { transform: translate(-5px, 5px); }
+            40% { transform: translate(5px, -5px); }
+            50% { transform: translate(-5px, -5px); }
+            60% { transform: translate(5px, 5px); }
+            70% { transform: translate(-5px, 5px); }
+            80% { transform: translate(5px, -5px); }
+            90% { transform: translate(-5px, -5px); }
+        }
+
+        .shake {
+            animation: shake 0.8s linear;
+        }
+
+        /* 最终消息容器样式 */
+        .final-container {
+            background-color: var(--primary-color);
+            color: white;
+            border: 3px solid red;
+        }
+
+        .final-content {
+            font-size: 1.2em;
+            background-color: white;
+            color: black;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .warning-text {
+            color: red;
+            font-weight: bold;
+            font-size: 1.5em;
+            margin-bottom: 15px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container" id="mainContainer">
         <div class="meituan-logo">美团</div>
         <h2 id="mainTitle">系统检测到异常浏览行为</h2>
         <p>为确保账户安全，请完成身份验证</p>
-        <button onclick="startPrank()">立即验证</button>
+        <button class="btn" onclick="startPrank()">立即验证</button>
     </div>
 
     <script>
-        function startPrank() {
-            alert("正在分析您的浏览数据...");
-            alert("⚠️ 发现多处异常操作！");
-            alert("最后一次验证机会，请如实回答！");
+        // 常量定义
+        const ERROR_MESSAGES = [
+            "名称不能为空，请重新输入！",
+            "请输入有效的名称！",
+            "系统即将失去耐心..."
+        ];
+        const SHAKE_DURATION = 800; // 抖动动画时长(ms)
+        const LOADING_DELAY = 1000; // 加载延迟(ms)
 
-            let userName = prompt("请输入您的名称以进行验证：");
+        // 恶作剧主流程
+        function startPrank() {
+            // 安全提示流程
+            showAlert("正在分析您的浏览数据...");
+            showAlert("⚠️ 发现多处异常操作！");
+            showAlert("最后一次验证机会，请如实回答！");
+
+            // 获取用户名（非空验证）
+            const userName = getValidUserName();
+            if (!userName) return; // 理论上不会触发，因为已做非空处理
+
+            // 过渡状态
+            showAlert("验证通过！...才怪");
+            updateContainerContent("<h2>重新评估中...</h2>");
             
-            // 循环验证直到输入非空名称
-            const errorMessages = ["名称不能为空，请重新输入！", "请输入有效的名称！", "系统即将失去耐心..."];
+            // 延迟后执行抖动动画
+            setTimeout(() => {
+                triggerShakeAnimation();
+                // 动画结束后显示最终消息
+                setTimeout(() => showFinalMessage(userName), SHAKE_DURATION);
+            }, LOADING_DELAY);
+        }
+
+        // 显示弹窗
+        function showAlert(message) {
+            alert(message);
+        }
+
+        // 获取有效的用户名
+        function getValidUserName() {
+            let userName = prompt("请输入您的名称以进行验证：");
             let errorCount = 0;
             
             while (!userName || userName.trim() === "") {
-                alert(errorMessages[errorCount % errorMessages.length]);
+                showAlert(ERROR_MESSAGES[errorCount % ERROR_MESSAGES.length]);
                 userName = prompt("请输入您的名称以进行验证：");
                 errorCount++;
             }
 
-            // 保存用户名用于最终显示
-            userName = userName.trim();
-
-            alert("验证通过！...才怪");
-            document.querySelector('.container').innerHTML = "<h2>重新评估中...</h2>";
-            document.body.style.backgroundColor = "#FFBD00";
-
-            setTimeout(() => {
-                let shakeCount = 0;
-                const shakeInterval = setInterval(() => {
-                    const randomX = Math.floor(Math.random() * 20) - 10;
-                    const randomY = Math.floor(Math.random() * 20) - 10;
-                    document.querySelector('.container').style.transform = `translate(${randomX}px, ${randomY}px)`;
-                    shakeCount++;
-                    if (shakeCount > 30) {
-                        clearInterval(shakeInterval);
-                        document.querySelector('.container').style.transform = 'translate(0, 0)';
-                        showFinalMessage(userName);
-                    }
-                }, 50);
-            }, 1000);
+            return userName.trim();
         }
 
+        // 更新容器内容
+        function updateContainerContent(html) {
+            const container = document.getElementById('mainContainer');
+            container.innerHTML = html;
+        }
+
+        // 触发抖动动画
+        function triggerShakeAnimation() {
+            const container = document.getElementById('mainContainer');
+            container.classList.add('shake');
+            
+            // 动画结束后移除类名
+            setTimeout(() => {
+                container.classList.remove('shake');
+            }, SHAKE_DURATION);
+        }
+
+        // 显示最终恶作剧消息
         function showFinalMessage(userName) {
-            document.body.innerHTML = `
-                <div class="container" style="background-color: #FFBD00; color: white; border: 3px solid red;">
+            const body = document.body;
+            body.innerHTML = `
+                <div class="container final-container" id="finalContainer">
                     <div class="meituan-logo" style="color: white; font-size: 32px;">⚠️ 美团安全中心</div>
                     <h1>重要通知</h1>
-                    <div style="font-size: 1.2em; background-color: white; color: black; padding: 20px; border-radius: 10px;">
-                        <p style="color: red; font-weight: bold; font-size: 1.5em;">${userName}已被美团拉入黑名单</p>
+                    <div class="final-content">
+                        <p class="warning-text">${userName}已被美团拉入黑名单</p>
                         <p>原因：检测到异常浏览行为</p>
                         <p>处理结果：限制部分功能使用</p>
                         <p>解封时间：永久</p>
                         <hr>
                         <p><small>（本页面纯属娱乐，请勿当真）</small></p>
                     </div>
-                    <button onclick="location.reload()" style="margin-top: 20px;">再玩一次</button>
+                    <button class="btn" onclick="location.reload()">再玩一次</button>
                 </div>
             `;
             
+            // 背景色动态变化效果
+            startBackgroundColorAnimation();
+        }
+
+        // 背景色动态变化
+        function startBackgroundColorAnimation() {
             setInterval(() => {
                 const hueVariation = Math.floor(Math.random() * 20) - 10;
                 document.body.style.backgroundColor = `hsl(45, 100%, ${50 + hueVariation}%)`;
             }, 500);
         }
 
-        document.addEventListener('contextmenu', function(e) {
+        // 禁用右键菜单
+        document.addEventListener('contextmenu', (e) => {
             e.preventDefault();
-            alert('此页面受到保护，禁止右键操作！');
+            showAlert('此页面受到保护，禁止右键操作！');
         });
     </script>
 </body>
