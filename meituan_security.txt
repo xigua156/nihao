@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统安全提示</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            text-align: center;
+            padding-top: 50px;
+            background-color: #FFBD00;
+            transition: all 0.5s;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            max-width: 500px;
+            margin: 20px;
+        }
+        button {
+            background-color: #FFBD00;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #E6A500;
+        }
+        .meituan-logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #FFBD00;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="meituan-logo">美团</div>
+        <h2 id="mainTitle">系统检测到异常浏览行为</h2>
+        <p>为确保账户安全，请完成身份验证</p>
+        <button onclick="startPrank()">立即验证</button>
+    </div>
+
+    <script>
+        function startPrank() {
+            alert("正在分析您的浏览数据...");
+            alert("⚠️ 发现多处异常操作！");
+            alert("最后一次验证机会，请如实回答！");
+
+            let userName = prompt("请输入您的名称以进行验证：");
+            
+            // 循环验证直到输入非空名称
+            const errorMessages = ["名称不能为空，请重新输入！", "请输入有效的名称！", "系统即将失去耐心..."];
+            let errorCount = 0;
+            
+            while (!userName || userName.trim() === "") {
+                alert(errorMessages[errorCount % errorMessages.length]);
+                userName = prompt("请输入您的名称以进行验证：");
+                errorCount++;
+            }
+
+            // 保存用户名用于最终显示
+            userName = userName.trim();
+
+            alert("验证通过！...才怪");
+            document.querySelector('.container').innerHTML = "<h2>重新评估中...</h2>";
+            document.body.style.backgroundColor = "#FFBD00";
+
+            setTimeout(() => {
+                let shakeCount = 0;
+                const shakeInterval = setInterval(() => {
+                    const randomX = Math.floor(Math.random() * 20) - 10;
+                    const randomY = Math.floor(Math.random() * 20) - 10;
+                    document.querySelector('.container').style.transform = `translate(${randomX}px, ${randomY}px)`;
+                    shakeCount++;
+                    if (shakeCount > 30) {
+                        clearInterval(shakeInterval);
+                        document.querySelector('.container').style.transform = 'translate(0, 0)';
+                        showFinalMessage(userName);
+                    }
+                }, 50);
+            }, 1000);
+        }
+
+        function showFinalMessage(userName) {
+            document.body.innerHTML = `
+                <div class="container" style="background-color: #FFBD00; color: white; border: 3px solid red;">
+                    <div class="meituan-logo" style="color: white; font-size: 32px;">⚠️ 美团安全中心</div>
+                    <h1>重要通知</h1>
+                    <div style="font-size: 1.2em; background-color: white; color: black; padding: 20px; border-radius: 10px;">
+                        <p style="color: red; font-weight: bold; font-size: 1.5em;">${userName}已被美团拉入黑名单</p>
+                        <p>原因：检测到异常浏览行为</p>
+                        <p>处理结果：限制部分功能使用</p>
+                        <p>解封时间：永久</p>
+                        <hr>
+                        <p><small>（本页面纯属娱乐，请勿当真）</small></p>
+                    </div>
+                    <button onclick="location.reload()" style="margin-top: 20px;">再玩一次</button>
+                </div>
+            `;
+            
+            setInterval(() => {
+                const hueVariation = Math.floor(Math.random() * 20) - 10;
+                document.body.style.backgroundColor = `hsl(45, 100%, ${50 + hueVariation}%)`;
+            }, 500);
+        }
+
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            alert('此页面受到保护，禁止右键操作！');
+        });
+    </script>
+</body>
+</html>
